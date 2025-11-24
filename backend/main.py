@@ -12,8 +12,8 @@ app = FastAPI()
 
 origins = [
     "http://localhost:5173",
-    "http://127.0.0.1:5173",  # Add this too
-    "http://localhost:3000",   # React default port
+    "http://127.0.0.1:5173",  
+    "http://localhost:3000",   
 ]
 
 app.add_middleware(
@@ -48,16 +48,12 @@ if not TWEETS_CSV.exists():
 # ---------------------------
 class LoginRequest(BaseModel):
     username: str
+    password: str
 
 class RegisterRequest(BaseModel):
     username: str
     email: str
-
-class TweetRequest(BaseModel):
-    username: str
-    image_link: str
-    description: str
-    likes: int = 0  # default to 0
+    password: str
 
 # ---------------------------
 # Helper Functions
@@ -75,7 +71,7 @@ def append_csv(path: Path, row: dict):
 # ---------------------------
 # ROUTES
 # ---------------------------
-# 1. REGISTER USER
+# REGISTER USER
 @app.post("/register")
 def register_user(data: RegisterRequest):
     users = read_csv(USERS_CSV)
@@ -90,49 +86,11 @@ def register_user(data: RegisterRequest):
     append_csv(USERS_CSV, data.dict())
     return {"message": "User registered successfully"}
 
-# 2. GET ALL TWEETS (FEED)
-@app.get("/feed")
-def get_feed():
-    tweets = read_csv(TWEETS_CSV)
-    # Convert likes to int
-    for t in tweets:
-        t["likes"] = int(t.get("likes", 0))
-    return tweets
-
-# 3. CREATE A NEW TWEET
-@app.post("/tweet")
-def create_tweet(data: TweetRequest):
-    users = read_csv(USERS_CSV)
-    if data.username not in [u["username"] for u in users]:
-        raise HTTPException(status_code=400, detail="User does not exist")
-
-    append_csv(TWEETS_CSV, data.dict())
-    return {"message": "Tweet posted"}
-
-# 4. GET USER PROFILE
-@app.get("/profile/{username}")
-def get_profile(username: str):
-    users = read_csv(USERS_CSV)
-    tweets = read_csv(TWEETS_CSV)
-
-    user = next((u for u in users if u["username"] == username), None)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    user_tweets = [t for t in tweets if t["username"] == username]
-    for t in user_tweets:
-        t["likes"] = int(t.get("likes", 0))
-
-    return {
-        "user": user,      # Includes username and email
-        "tweets": user_tweets
-    }
-
-# 5. LOGIN USER
+# LOGIN USER
 @app.post("/login")
 def login_user(data: LoginRequest):
     users = read_csv(USERS_CSV)
-    user = next((u for u in users if u["username"] == data.username), None)
+    user = next((u for u in users if u["username"] == data.username and u["password"] == data.password), None)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return {"message": f"Login successful for {data.username}"}

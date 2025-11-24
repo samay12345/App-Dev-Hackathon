@@ -7,6 +7,7 @@ import './Register.css'
 export default function Register() {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
@@ -18,7 +19,7 @@ export default function Register() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, email }),
+        body: JSON.stringify({ username, email, password }),
       });
 
       const data = await response.json();
@@ -27,6 +28,7 @@ export default function Register() {
         setMessage("Registration successful!");
         setUsername("");
         setEmail("");
+        setPassword("");
       } else {
         setMessage(`Error: ${data.detail}`);
       }
@@ -57,6 +59,15 @@ export default function Register() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+
+            <input
+            className="auth-input"
+            type="password"
+            placeholder="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             required
           />
 

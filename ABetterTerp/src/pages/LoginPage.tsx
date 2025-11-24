@@ -6,6 +6,7 @@ import "./Register.css"; // reuse your existing styling
 export default function Login() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
@@ -14,7 +15,7 @@ export default function Login() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!username || !email) return;
+    if (!username || !email || !password) return;
 
     // Store user info in localStorage
     localStorage.setItem("username", username);
@@ -22,7 +23,10 @@ export default function Login() {
 
     setMessage(`Logged in as ${username}`);
 
-    // Optionally navigate to feed page
+    // clear password field for security/UX
+    setPassword("");
+
+    // Optionally navigate to feed/page
     setTimeout(() => navigate("/profile"), 500);
   };
 
@@ -46,6 +50,15 @@ export default function Login() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+
+          <input
+            className="auth-input"
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             required
           />
 

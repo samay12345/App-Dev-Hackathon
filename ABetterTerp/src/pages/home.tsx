@@ -11,23 +11,28 @@ export default function Home() {
         setUsername(name);
     }, []);
 
-    const affirmations: string[] = [
-        "I am capable of achieving my goals.",
-        "I grow stronger and wiser every day.",
-        "I choose progress over perfection.",
-        "I embrace challenges and learn from them.",
-        "I am worthy of success and happiness.",
-        "I bring value to my work and my community.",
-        "Today I will be kind to myself and others.",
-        "My potential to succeed is infinite.",
-        "I trust my intuition and make clear decisions.",
-        "I am focused, persistent, and will never quit."
-    ];
+    const [affirmations, setAffirmations] = useState<string[]>([]);
 
-    // Use UTC days since epoch so affirmation changes once per day regardless of timezone.
-    const daysSinceEpoch = Math.floor(Date.now() / 86400000);
-    const dayIndex = daysSinceEpoch % affirmations.length;
-    const todaysAffirmation = affirmations[dayIndex];
+    // fetch affirmations from backend once
+    useEffect(() => {
+        (async () => {
+            try {
+                const res = await fetch('http://localhost:8000/affirmations');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (Array.isArray(data)) setAffirmations(data);
+                }
+            } catch (err) {
+                console.error('Failed to load affirmations', err);
+            }
+        })();
+    }, []);
+
+    // Use local days since epoch so affirmation changes at local midnight for each user.
+    const localMidnight = new Date();
+    localMidnight.setHours(0, 0, 0, 0);
+    const daysSinceEpochLocal = Math.floor(localMidnight.getTime() / 86400000);
+    const todaysAffirmation = affirmations.length ? affirmations[daysSinceEpochLocal % affirmations.length] : "Today is a great day to learn and build something new.";
 
     // --- Daily habits & streak (per-user) ---
     // Use local date key (YYYY-MM-DD) so habits reset at local midnight.
@@ -169,12 +174,20 @@ export default function Home() {
                     <div className="sections-grid">
                         <div className="section section-academic">
                             <h3>Academic</h3>
-                            <p>Track assignments, deadlines, and academic goals here. Example: Finish reading chapter 5 by Friday.</p>
+                            <p>A Smart Terp stays on top of their classes</p>
+                            <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem' }}>
+                                <Link to="/assignments"><button className="btn btn-primary">Assignments</button></Link>
+                                <Link to="/exams"><button className="btn btn-secondary">Exams</button></Link>
+                            </div>
                         </div>
 
                         <div className="section section-health">
                             <h3>Health</h3>
-                            <p>Log habits, workouts, and wellbeing notes. Example: 30 minutes walk and hydrate regularly.</p>
+                            <p>A Healthy Terp can balance class with their body wellness</p>
+                            <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem' }}>
+                                <Link to="/workouts"><button className="btn btn-primary">Workouts</button></Link>
+                                <Link to="/water"><button className="btn btn-secondary">Water Intake</button></Link>
+                            </div>
                         </div>
                     </div>
 

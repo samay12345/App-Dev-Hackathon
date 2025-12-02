@@ -26,7 +26,7 @@ export default function Login() {
     // clear password field for security/UX
     setPassword("");
 
-    // Optionally navigate to feed/page
+    // Optionally navigate to home/page
     setTimeout(() => navigate("/home"), 500);
   };
 
@@ -66,7 +66,7 @@ export default function Login() {
         </form>
 
         <p className="auth-link">
-          <Link to="/">Need an Account?</Link>
+          <Link to="/register">Need an Account?</Link>
         </p>
 
         {message && <p className="auth-message">{message}</p>}

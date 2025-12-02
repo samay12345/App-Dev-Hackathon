@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
+import { useNavigate } from "react-router";
 import './Register.css'
 
 
@@ -9,6 +10,7 @@ export default function Register() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -29,6 +31,8 @@ export default function Register() {
         setUsername("");
         setEmail("");
         setPassword("");
+
+        setTimeout(() => navigate("/home"), 500);
       } else {
         setMessage(`Error: ${data.detail}`);
       }

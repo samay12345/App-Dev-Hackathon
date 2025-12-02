@@ -28,11 +28,9 @@ export default function Home() {
         })();
     }, []);
 
-    // Use local days since epoch so affirmation changes at local midnight for each user.
-    const localMidnight = new Date();
-    localMidnight.setHours(0, 0, 0, 0);
-    const daysSinceEpochLocal = Math.floor(localMidnight.getTime() / 86400000);
-    const todaysAffirmation = affirmations.length ? affirmations[daysSinceEpochLocal % affirmations.length] : "Today is a great day to learn and build something new.";
+    // Use UTC days since epoch so affirmation changes once per day regardless of timezone.
+    const daysSinceEpoch = Math.floor(Date.now() / 86400000);
+    const todaysAffirmation = affirmations.length ? affirmations[daysSinceEpoch % affirmations.length] : "Today is a great day to learn and build something new.";
 
     // --- Daily habits & streak (per-user) ---
     // Use local date key (YYYY-MM-DD) so habits reset at local midnight.

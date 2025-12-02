@@ -32,6 +32,12 @@ export default function Register() {
         setEmail("");
         setPassword("");
 
+        // Store user info in localStorage
+        localStorage.setItem("username", username);
+        localStorage.setItem("email", email);
+
+    setMessage(`Logged in as ${username}`);
+
         setTimeout(() => navigate("/home"), 500);
       } else {
         setMessage(`Error: ${data.detail}`);

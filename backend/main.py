@@ -136,9 +136,12 @@ def get_habits(username: str):
 @app.post("/habits")
 def create_habit(h: HabitCreate):
     # generate a simple id
-    row = {"username": h.username, "title": h.title, "description": h.description or ""}
+    import uuid
+    hid = str(uuid.uuid4())
+    row = {"username": h.username, "id": hid, "title": h.title, "description": h.description or ""}
     append_csv(HABITS_CSV, row)
     return {"message": "Habit created", "habit": row}
+
 
 
 # AFFIRMATIONS endpoints

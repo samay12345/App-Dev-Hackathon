@@ -13,8 +13,10 @@ export default function WaterIntake() {
   const [dailyGoal, setDailyGoal] = useState('');
   const [currentOz, setCurrentOz] = useState(0);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
-
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [hasReachedGoal, setHasReachedGoal] = useState(false);
   console.log('WaterIntake rendering', { isSetup, bottleName });
+
   // place holder backend for setup
   const handleSetup = () => {
     if (bottleName && bottleOz && dailyGoal) {
@@ -27,6 +29,12 @@ export default function WaterIntake() {
   const addOz = () => {
     const newOz = currentOz + 1;
     setCurrentOz(newOz);
+
+    if (newOz >= parseInt(dailyGoal) && !hasReachedGoal) {
+      setShowConfetti(true);
+      setHasReachedGoal(true);
+      setTimeout(() => setShowConfetti(false), 3000);
+    }
     
   };
 
@@ -35,6 +43,10 @@ export default function WaterIntake() {
     if (currentOz > 0) {
       const newOz = currentOz - 1;
       setCurrentOz(newOz);
+
+      if (newOz < parseInt(dailyGoal)) {
+      setHasReachedGoal(false);
+      }
       
     }
   };
@@ -114,7 +126,8 @@ export default function WaterIntake() {
 
   return (
     <div className="water-intake-page">
-      
+      {showConfetti && <Confetti />}
+
       <div className="tracker-container">
         <div className="tracker-card">
           <div className="tracker-header">
@@ -189,3 +202,22 @@ export default function WaterIntake() {
   );
 }
 
+function Confetti() {
+  const pieces = Array.from({ length: 50 });
+  
+  return (
+    <div className="confetti-container">
+      {pieces.map((_, i) => (
+        <div
+          key={i}
+          className="confetti-piece"
+          style={{
+            left: `${Math.random() * 100}%`,
+            backgroundColor: ['#E21833', '#FFD200', '#FFFFFF'][Math.floor(Math.random() * 3)],
+            animationDuration: `${2 + Math.random() * 2}s`
+          }}
+        />
+      ))}
+    </div>
+  );
+}

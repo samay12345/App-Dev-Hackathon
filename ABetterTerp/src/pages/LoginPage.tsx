@@ -12,22 +12,41 @@ export default function Login() {
 
 
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!username || !email || !password) return;
+    if (!username || !password) return;
 
-    // Store user info in localStorage
-    localStorage.setItem("username", username);
-    localStorage.setItem("email", email);
+    try {
+      const response = await fetch("http://localhost:8000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
 
-    setMessage(`Logged in as ${username}`);
+      const data = await response.json();
 
-    // clear password field for security/UX
-    setPassword("");
+      if (response.ok) {
+        // Store user info in localStorage
+        localStorage.setItem("username", data.username);
+        localStorage.setItem("email", email);
 
-    // Optionally navigate to home/page
-    setTimeout(() => navigate("/home"), 500);
+        setMessage(`Logged in as ${data.username}`);
+
+        // clear password field for security/UX
+        setPassword("");
+
+        // Navigate to home
+        setTimeout(() => navigate("/home"), 500);
+      } else {
+        setMessage(`Error: ${data.detail}`);
+      }
+    } catch (err) {
+      console.error(err);
+      setMessage("Error: Could not connect to server");
+    }
   };
 
   return (

@@ -11,7 +11,7 @@ export default function Home() {
         setUsername(name);
     }, []);
 
-    const [affirmations, setAffirmations] = useState<string[]>([]);
+    const [affirmations, setAffirmations] = useState<Array<{id: string, text: string}>>([]);
 
     // fetch affirmations from backend once
     useEffect(() => {
@@ -30,7 +30,9 @@ export default function Home() {
 
     // Use UTC days since epoch so affirmation changes once per day regardless of timezone.
     const daysSinceEpoch = Math.floor(Date.now() / 86400000);
-    const todaysAffirmation = affirmations.length ? affirmations[daysSinceEpoch % affirmations.length] : "Today is a great day to learn and build something new.";
+    const todaysAffirmation = affirmations.length 
+        ? affirmations[daysSinceEpoch % affirmations.length].text 
+        : "Today is a great day to learn and build something new.";
 
     // --- Daily habits & streak (per-user) ---
     // Use local date key (YYYY-MM-DD) so habits reset at local midnight.
@@ -58,6 +60,7 @@ export default function Home() {
                 const res = await fetch(`http://localhost:8000/habits?username=${encodeURIComponent(username)}`);
                 if (res.ok) {
                     const data = await res.json();
+                    console.log('Loaded habits:', data);
                     setHabits(data || []);
                 }
             } catch (err) {
@@ -70,10 +73,14 @@ export default function Home() {
         setStreak(s ? Number(s) : 0);
         const lsd = localStorage.getItem(`streakDate-${username}`);
         setLastStreakDate(lsd);
+    }, [username]); // Only depend on username, not todayKey
 
-        // load today's completed set for this user
+    // Load today's completed set separately based on todayKey
+    useEffect(() => {
+        if (!username) return;
         const raw = localStorage.getItem(`habits-${username}-${todayKey}`);
         if (raw) setCompleted(JSON.parse(raw));
+        else setCompleted({});
     }, [username, todayKey]);
 
     // Persist streak and lastStreakDate when they change (per-user)
